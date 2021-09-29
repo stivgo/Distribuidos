@@ -1,0 +1,23 @@
+{
+  "name": "dht",
+  "version": "1.0.0",
+  "description": "proyecto distribuidos - seccion dht",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "distribuidos",
+    "-",
+    "bolsa",
+    "de",
+    "empleo",
+    "-",
+    "publish/Subscribe"
+  ],
+  "author": "Stiven Gonzalez",
+  "license": "ISC",
+  "dependencies": {
+    "zeromq": "^6.0.0-beta.6"
+  }
+}
