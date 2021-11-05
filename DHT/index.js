@@ -17,8 +17,9 @@ const main = async () => {
       let b = Buffer.from(data.data);
       let s = b.toString('utf-8');
       let o = JSON.parse(s);
-      o.map(element=> setInfo(element.idEmpleador+element.idOferta, 
-        element.Clasificacion+" "+element.Nombre))
+      /*o.map(element=> setInfo(element.idEmpleador+element.idOferta, 
+        element.Clasificacion+" "+element.Nombre))*/
+      console.log(o)
       getInfo('110')
       const sendInfo = Buffer.from(JSON.stringify('recepcion DHT'));
       await sock.send(sendInfo);
