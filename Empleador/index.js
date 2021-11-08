@@ -19,7 +19,7 @@ servidor.post('/', async (req, res, next) => {
   console.log(req.body);
   try {
     const buf = Buffer.from(JSON.stringify(req.body));
-    await sock.send(['Empleos45', buf]);
+    await sock.send(['Ofertas', buf]);
     res.status(201).json({ data: 'Se envio el empleo' });
   } catch (error) {
     console.log(error);

@@ -1,5 +1,7 @@
 const express = require('express');
 
+let ofertas = []
+
 // Comunicación entre empleador y Aspirante
 const zmq = require('zeromq');
 const sockPub = new zmq.Publisher();
@@ -22,15 +24,12 @@ servidor.use((err, req, res, next) => {
 
 async function sockSubOn() {
   for await (const [topic, msg] of sockSub) {
-    console.log(
-      'received a message related to:',
-      String(topic),
-      'containing message:',
-      JSON.parse(msg)
-    );
-
+    console.log('Topic: ',String(topic),'\n','Message: ',JSON.parse(msg));
+    let oferta = Oferta.fromJSON(msg)
+    ofertas.push(oferta);
+    console.log(oferta);
     try {
-      const msgDHT = Buffer.from(JSON.stringify(msg));
+      const msgDHT = String(oferta);
       await sockDHT.send(msgDHT);
       const [result] = await sockDHT.receive();
       const resultParse = JSON.parse(result.toString());
@@ -38,12 +37,13 @@ async function sockSubOn() {
     } catch (error) {
       console.log(error);
     }
+    console.log("termine")
   }
 }
 
 servidor.listen(3001, () => {
   sockSub.connect('tcp://127.0.0.1:8001');
-  sockSub.subscribe('Empleos');
+  sockSub.subscribe('Ofertas');
   console.log('Subscriber connected to port 8001');
   sockDHT.connect('tcp://127.0.0.1:8002');
   console.log('SeverDHT bound to port 8002');
