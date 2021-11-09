@@ -1,6 +1,7 @@
 ('use strict');
 var kad = require('kademlia-dht');
 const zmq = require('zeromq');
+const Oferta = require('../Common/Oferta');
 
 const sock = new zmq.Reply();
 let DHT1;
@@ -9,12 +10,14 @@ let DHT2;
 const main = async () => {
   
   console.log('Servidor DHT escuchando puerto 8002');
-  
   try {
     await sock.bind('tcp://127.0.0.1:8002');
     for await (const [msg] of sock) {
-      const data = JSON.parse(msg.toString());
-      let b = Buffer.from(data.data);
+      //Se recibe una ofreta, solo falta guardarla
+      let oferta = Oferta.fromJSON(msg);
+      console.log(oferta);
+      //Antes había una cosa llamada data pero ahora la idea sería guardar la oferta
+      let b = Buffer.from(data);
       let s = b.toString('utf-8');
       let o = JSON.parse(s);
       o.map(element=> setInfo(element.idEmpleador+element.idOferta, 

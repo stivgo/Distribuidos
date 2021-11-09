@@ -1,4 +1,5 @@
 const express = require('express');
+const Oferta = require('../Common/Oferta.js');
 
 let ofertas = []
 
@@ -25,12 +26,11 @@ servidor.use((err, req, res, next) => {
 async function sockSubOn() {
   for await (const [topic, msg] of sockSub) {
     console.log('Topic: ',String(topic),'\n','Message: ',JSON.parse(msg));
-    let oferta = Oferta.fromJSON(msg)
+    let oferta = Oferta.fromJSON(msg);
     ofertas.push(oferta);
-    console.log(oferta);
     try {
-      const msgDHT = String(oferta);
-      await sockDHT.send(msgDHT);
+      console.log("Info a enviar:\n"+oferta.toJSON());
+      await sockDHT.send(oferta.toJSON());
       const [result] = await sockDHT.receive();
       const resultParse = JSON.parse(result.toString());
       console.log(resultParse)
