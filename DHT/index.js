@@ -13,17 +13,10 @@ const main = async () => {
   try {
     await sock.bind('tcp://127.0.0.1:8002');
     for await (const [msg] of sock) {
-      //Se recibe una ofreta, solo falta guardarla
       let oferta = Oferta.fromJSON(msg);
       console.log(oferta);
-      //Antes había una cosa llamada data pero ahora la idea sería guardar la oferta
-      let b = Buffer.from(data);
-      let s = b.toString('utf-8');
-      let o = JSON.parse(s);
-      o.map(element=> setInfo(element.idEmpleador+element.idOferta, 
-        element.Clasificacion+" "+element.Nombre))
-      console.log(o)
-      getInfo('110')
+      setInfo(oferta.id+" "+oferta.empleador,oferta);
+      getInfo('1 1')
       const sendInfo = Buffer.from(JSON.stringify('recepcion DHT'));
       await sock.send(sendInfo);
     }
