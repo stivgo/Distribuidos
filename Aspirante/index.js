@@ -56,14 +56,19 @@ async function sockSubFiltroOn() {
   }
 }
 
-servidor.listen(3002, async () => {
-  await sockPubFiltro.bind('tcp://25.70.133.238:8003');
-  console.log('Publisher bound to sport 8003');
+servidor.listen(8002, async () => {
+  try {
+    await sockPubFiltro.bind('tcp://192.168.10.36:8003');
+    console.log('Publisher bound to sport 8003');
 
-  sockSubFiltro.connect('tcp://25.70.133.238:8004');
-  sockSubFiltro.subscribe('Respuesta');
-  console.log('Subscriber Empleador connected to port 8004');
-  sockSubFiltroOn();
+    sockSubFiltro.connect('tcp://192.168.10.36:8003');
+    sockSubFiltro.subscribe('Respuesta');
+    console.log('Subscriber Empleador connected to port 60004');
+    sockSubFiltroOn();
 
-  console.log('Servidor escuchando puerto 3002');
+    console.log('Servidor escuchando puerto 8003');
+  } catch (error) {
+    console.log(error);
+  }
+  
 });
