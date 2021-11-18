@@ -12,9 +12,9 @@ let DHT2;
 
 const main = async () => {
   
-  console.log('Servidor DHT escuchando puerto 8002');
+  console.log('Servidor DHT escuchando puerto 8005');
   try {
-    await sock.bind('tcp://127.0.0.1:8002');
+    await sock.bind('tcp://127.0.0.1:8005');
     for await (const [msg] of sock) {
       let oferta = Oferta.fromJSON(msg);
       console.log(oferta);
