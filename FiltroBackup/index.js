@@ -74,13 +74,9 @@ async function enviarMensajeAspirante(msg) {
   await sockPubAspirante.send(['Respuesta', buf]);
 }
 
-async function backUp() {
-  await sockBackup.send('OK');
-  const [result] = await sockBackup.receive();
-  console.log(JSON.parse(result));
+async function conectarComponentes() {
 
-  if (false) {
-    sockSubEmpleador.connect('tcp://127.0.0.1:8001');
+  sockSubEmpleador.connect('tcp://127.0.0.1:8001');
     sockSubEmpleador.subscribe('Ofertas');
     sockSubEmpleadorOn();
     console.log('Subscriber Empleador connected to port 8001');
@@ -98,7 +94,27 @@ async function backUp() {
 
     sockDHT.connect('tcp://127.0.0.1:8005');
     console.log('SeverDHT bound to port 8005');
-  }
+
+}
+
+
+async function backUp() {
+  let interval = setInterval(async () => {
+    try {
+      await sockBackup.send('OK');
+      const [result] = await sockBackup.receive();
+      console.log(JSON.parse(result));
+      if (JSON.parse(result) === 'error') {
+        clearInterval(interval);
+        conectarComponentes()
+      }
+      console.log('enviando petición');
+    } catch (error) {
+      console.log("No se conecto servidor");
+      clearInterval(interval);
+      conectarComponentes()
+    }
+  }, 1000);
 }
 
 servidor.listen(3005, () => {

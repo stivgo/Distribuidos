@@ -81,8 +81,6 @@ async function backUp() {
     await sockBackup.bind('tcp://127.0.0.1:8006');
     console.log('Servidor Backup escuchando puerto 8006');
     for await (const [msg] of sockBackup) {
-      console.log(msg);
-      console.log('Entonces');
       const sendInfo = Buffer.from(JSON.stringify('OK'));
       await sockBackup.send(sendInfo);
     }
