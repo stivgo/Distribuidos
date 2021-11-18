@@ -37,7 +37,6 @@ async function sockSubOn() {
     } catch (error) {
       console.log(error);
     }
-    console.log("termine")
   }
 }
 
