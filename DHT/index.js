@@ -15,17 +15,26 @@ const main = async () => {
   try {
     await sock.bind('tcp://127.0.0.1:8005');
     for await (const [msg] of sock) {
-      let oferta = Oferta.fromJSON(msg);
-      console.log(oferta);
-      ofertas.push(oferta.toJSON());
-      fs.writeFile('test.json', '[' + ofertas.toString() + ']', function (err) {
-        if (err) {
-          console.log(err);
-        }
-      });
-      setInfo(oferta.id + ' ' + oferta.empleador, oferta);
-      const sendInfo = Buffer.from(JSON.stringify('recepcion DHT'));
-      await sock.send(sendInfo);
+      console.log(msg);
+      if(msg.toString() == "Buscar"){
+        let info = getInfo();
+        const sendInfo = Buffer.from(JSON.stringify(info));
+        await sock.send(sendInfo);
+      }
+      else{
+        let oferta = Oferta.fromJSON(msg);
+        console.log(oferta);
+        ofertas.push(oferta.toJSON());
+        fs.writeFile('test.json', '[' + ofertas.toString() + ']', function (err) {
+          if (err) {
+            console.log(err);
+          }
+        });
+        setInfo(oferta.id + ' ' + oferta.empleador, oferta);
+        getInfo();
+        const sendInfo = Buffer.from(JSON.stringify('recepcion DHT'));
+        await sock.send(sendInfo);
+      }
     }
   } catch (err) {
     sock.send('No inserta la infomación');
@@ -41,12 +50,13 @@ function setInfo(key, value) {
   DHT1.set(key, value, function (err) {});
 }
 
-function getInfo(key) {
-  DHT2.get(key, function (err, value) {
+function getInfo() {
+  /*DHT2.get(key, function (err, value) {
     console.log('valor de la key : ' + key + ' es : ' + value);
-  });
+  });*/
   console.log('---DHT1 HASH---_');
   console.log(DHT1._locals);
+  return DHT1._locals;
 }
 
 // Spawn a node. A node is composed of two elements: the local Dht and the Rpc.

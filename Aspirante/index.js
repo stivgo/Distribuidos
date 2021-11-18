@@ -22,7 +22,7 @@ servidor.post('/aspirante', async (req, res, next) => {
   console.log(req.body);
   try {
     const buf = Buffer.from(JSON.stringify(req.body));
-    await sockPubFiltro.send(['Ofertas', buf]);
+    await sockPubFiltro.send(['Aspirante', buf]);
     res.status(201).json({ data: 'Se envio hoja de vida' });
   } catch (error) {
     console.log(error);
@@ -53,7 +53,6 @@ async function sockSubFiltroOn() {
     } catch (error) {
       console.log(error);
     }
-    console.log('termine');
   }
 }
 

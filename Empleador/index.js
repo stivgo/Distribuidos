@@ -46,14 +46,13 @@ servidor.post('/empleador/sub', async (req, res, next) => {
 
 async function sockSubFiltroOn() {
   for await (const [topic, msg] of sockSubFiltro) {
-    console.log('Topic: ', String(topic), '\n', 'Message: ', JSON.parse(msg));
-    let oferta = Oferta.fromJSON(msg);
+    //console.log('Topic: ', String(topic), '\n', 'Message: ', JSON.parse(msg));
+    let aspirante = JSON.parse(msg);
     try {
-      console.log('Se actualizo la oferta publicada :\n' + oferta.toJSON());
+      console.log('Hay un aspirante que puede aplicar al trabajo :\n' , aspirante);
     } catch (error) {
       console.log(error);
     }
-    console.log('termine');
   }
 }
 
