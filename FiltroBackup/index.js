@@ -47,7 +47,6 @@ async function sockSubEmpleadorOn() {
     } catch (error) {
       console.log(error);
     }
-    console.log('termine');
   }
 }
 
