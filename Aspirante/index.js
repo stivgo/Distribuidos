@@ -61,8 +61,8 @@ servidor.listen(3002, async () => {
   await sockPubFiltro.bind('tcp://127.0.0.1:8003');
   console.log('Publisher bound to sport 8003');
   
-  sockSubEmpleador.connect('tcp://127.0.0.1:8004');
-  sockSubEmpleador.subscribe('Respuesta');
+  sockSubFiltro.connect('tcp://127.0.0.1:8004');
+  sockSubFiltro.subscribe('Respuesta');
   console.log('Subscriber Empleador connected to port 8004');
   sockSubFiltroOn();
   
