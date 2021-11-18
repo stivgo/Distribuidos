@@ -12,9 +12,9 @@ let DHT2;
 let DHT3;
 
 const main = async () => {
-  console.log('Servidor DHT escuchando puerto 80005');
+  console.log('Servidor DHT escuchando puerto 8005');
   try {
-    await sock.bind('tcp://192.168.10.36:80005');
+    await sock.bind('tcp://127.0.0.1:8005');
     for await (const [msg] of sock) {
       console.log(msg);
       if(msg.toString() == "Buscar"){
@@ -73,12 +73,12 @@ function spawnNode(endpoint, seeds, cb) {
 }
 
 function createSpawnNode() {
-  spawnNode('192.168.239.130:9876', [], function (err, dht1) {
+  spawnNode('localhost:9876', [], function (err, dht1) {
       DHT1 = dht1;
-    spawnNode('192.168.239.129:4321', [dht1.rpc.endpoint], function (err, dht2) {
+    spawnNode('localhost:4321', [dht1.rpc.endpoint], function (err, dht2) {
       DHT2 = dht2;
     });
-    spawnNode('192.168.10.36:4322', [dht1.rpc.endpoint], function (err, dht3) {
+    spawnNode('localhost:4322', [dht1.rpc.endpoint], function (err, dht3) {
       DHT3 = dht3;
     });
   });

@@ -47,6 +47,7 @@ async function sockSubEmpleadorOn() {
     } catch (error) {
       console.log(error);
     }
+    console.log('termine');
   }
 }
 
@@ -100,7 +101,7 @@ async function verificarOfertas(){
 async function backUp() {
   console.log('Servidor Filtro escuchando puerto 8006');
   try {
-    await sockBackup.bind('tcp://192.168.239.129:8006');
+    await sockBackup.bind('tcp://127.0.0.1:8006');
     console.log('Servidor Backup escuchando puerto 8006');
     for await (const [msg] of sockBackup) {
       console.log('Backup: ', msg.toString());
@@ -118,27 +119,27 @@ async function backUp() {
   }
 }
 
-servidor.listen(8001, async () => {
-  sockSubEmpleador.connect('tcp://192.168.239.130:8003');
+servidor.listen(3001, async () => {
+  sockSubEmpleador.connect('tcp://127.0.0.1:8001');
   sockSubEmpleador.subscribe('Ofertas');
   sockSubEmpleadorOn();
-  console.log('Subscriber Empleador connected to port 8003');
+  console.log('Subscriber Empleador connected to port 8001');
 
-  await sockPubEmpleador.bind('tcp://192.168.239.130:8002');
-  console.log('Publisher Empleador to sport 80002');
+  await sockPubEmpleador.bind('tcp://127.0.0.1:8002');
+  console.log('Publisher Empleador to sport 8002');
 
-  sockSubAspirante.connect('tcp://192.168.239.130:8003');
+  sockSubAspirante.connect('tcp://127.0.0.1:8003');
   sockSubAspirante.subscribe('Aspirante');
   sockSubAspiranteOn();
   console.log('Subscriber Aspirante connected to port 8003');
 
-  await sockPubAspirante.bind('tcp://192.168.239.130:8004');
-  console.log('Publisher Empleador to sport 80004');
+  await sockPubAspirante.bind('tcp://127.0.0.1:8004');
+  console.log('Publisher Empleador to sport 8004');
 
-  sockDHT.connect('tcp://192.168.239.130:8005');
+  sockDHT.connect('tcp://127.0.0.1:8005');
   console.log('SeverDHT bound to port 8005');
 
   backUp();
 
-  console.log('Servidor Filtro escuchando puerto 8001');
+  console.log('Servidor Filtro escuchando puerto 3001');
 });
