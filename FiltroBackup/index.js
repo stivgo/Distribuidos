@@ -1,7 +1,9 @@
 const express = require('express');
 const Oferta = require('../Common/Oferta.js');
+const Aspirante = require('../Common/Aspirante.js');
 
 let ofertas = [];
+let aspirantes = [];
 
 // Comunicación entre Empleador
 const zmq = require('zeromq');
@@ -15,6 +17,7 @@ const sockSubAspirante = new zmq.Subscriber();
 // Comunicación entre DHT
 const sockDHT = new zmq.Request();
 
+// Comunicación entre Backup
 const sockBackup = new zmq.Request();
 
 const servidor = express();
@@ -39,6 +42,7 @@ async function sockSubEmpleadorOn() {
       await sockDHT.send(oferta.toJSON());
       const [result] = await sockDHT.receive();
       const resultParse = JSON.parse(result.toString());
+      verificarOfertas();
       console.log(resultParse);
     } catch (error) {
       console.log(error);
@@ -53,25 +57,45 @@ async function enviarMensajeEmpleador(msg) {
 }
 
 async function sockSubAspiranteOn() {
-  for await (const [topic, msg] of sockSubAspirante) {
-    console.log('Topic: ', String(topic), '\n', 'Message: ', JSON.parse(msg));
-    let oferta = Oferta.fromJSON(msg);
-    ofertas.push(oferta);
-    try {
-      console.log('Info a enviar:\n' + oferta.toJSON());
-      await sockDHT.send(oferta.toJSON());
-      const [result] = await sockDHT.receive();
-      const resultParse = JSON.parse(result.toString());
-      console.log(resultParse);
-    } catch (error) {
-      console.log(error);
+  try{
+    for await (const [topic, msg] of sockSubAspirante) {
+      console.log('Topic: ', String(topic), '\n', 'Message: ', JSON.parse(msg));
+      let aspirante = Aspirante.fromJSON(msg);
+      aspirantes.push(aspirante);
+      verificarOfertas();
+      console.log(aspirantes);
     }
+  }catch(e){
+    console.log(e);
   }
 }
 
 async function enviarMensajeAspirante(msg) {
   const buf = Buffer.from(JSON.stringify(msg));
   await sockPubAspirante.send(['Respuesta', buf]);
+}
+
+async function verificarOfertas(){
+  try {
+    await sockDHT.send("Buscar");
+    const [result] = await sockDHT.receive();
+    const data = JSON.parse(result);
+    //console.log(data);
+    console.log(Object.values(data));
+    let ofertasDHT = Object.values(data);
+    ofertasDHT.map(oferta =>{
+      let ofertaJSON = JSON.parse(oferta);
+      aspirantes.forEach(aspirante => {
+        if(aspirante.sector.includes(ofertaJSON.sector)){
+          enviarMensajeAspirante(ofertaJSON);
+          enviarMensajeEmpleador(aspirante);
+        }
+      });
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  
 }
 
 async function conectarComponentes() {
@@ -103,7 +127,10 @@ async function backUp() {
     try {
       await sockBackup.send('OK');
       const [result] = await sockBackup.receive();
-      console.log(JSON.parse(result));
+      console.log("BackUp Ok");
+      let results = JSON.parse( result);
+      ofertas = results.ofertas;
+      aspirantes = results.aspirantes;
       if (JSON.parse(result) === 'error') {
         clearInterval(interval);
         conectarComponentes()
