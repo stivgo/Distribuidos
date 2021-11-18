@@ -15,6 +15,9 @@ const sockSubAspirante = new zmq.Subscriber();
 // Comunicación entre DHT
 const sockDHT = new zmq.Request();
 
+// Comunicación entre Backup
+const sockBackup = new zmq.Reply();
+
 const servidor = express();
 servidor.use(express.json());
 
@@ -51,7 +54,7 @@ async function enviarMensajeEmpleador(msg) {
 }
 
 async function sockSubAspiranteOn() {
-  for await (const [topic, msg] of sockSubEmpleador) {
+  for await (const [topic, msg] of sockSubAspirante) {
     console.log('Topic: ', String(topic), '\n', 'Message: ', JSON.parse(msg));
     let oferta = Oferta.fromJSON(msg);
     ofertas.push(oferta);
@@ -72,7 +75,25 @@ async function enviarMensajeAspirante(msg) {
   await sockPubAspirante.send(['Respuesta', buf]);
 }
 
-servidor.listen(3001, () => {
+async function backUp() {
+  console.log('Servidor Filtro escuchando puerto 8006');
+  try {
+    await sockBackup.bind('tcp://127.0.0.1:8006');
+    console.log('Servidor Backup escuchando puerto 8006');
+    for await (const [msg] of sockBackup) {
+      console.log(msg);
+      console.log('Entonces');
+      const sendInfo = Buffer.from(JSON.stringify('OK'));
+      await sockBackup.send(sendInfo);
+    }
+    console.log('Entonces2');
+  } catch (err) {
+    sockBackup.send('error');
+    console.log(err);
+  }
+}
+
+servidor.listen(3001, async () => {
   sockSubEmpleador.connect('tcp://127.0.0.1:8001');
   sockSubEmpleador.subscribe('Ofertas');
   sockSubEmpleadorOn();
@@ -91,6 +112,8 @@ servidor.listen(3001, () => {
 
   sockDHT.connect('tcp://127.0.0.1:8005');
   console.log('SeverDHT bound to port 8005');
+
+  backUp();
 
   console.log('Servidor Filtro escuchando puerto 3001');
 });

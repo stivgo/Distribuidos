@@ -15,6 +15,8 @@ const sockSubAspirante = new zmq.Subscriber();
 // Comunicación entre DHT
 const sockDHT = new zmq.Request();
 
+const sockBackup = new zmq.Request();
+
 const servidor = express();
 servidor.use(express.json());
 
@@ -51,7 +53,7 @@ async function enviarMensajeEmpleador(msg) {
 }
 
 async function sockSubAspiranteOn() {
-  for await (const [topic, msg] of sockSubEmpleador) {
+  for await (const [topic, msg] of sockSubAspirante) {
     console.log('Topic: ', String(topic), '\n', 'Message: ', JSON.parse(msg));
     let oferta = Oferta.fromJSON(msg);
     ofertas.push(oferta);
@@ -72,7 +74,11 @@ async function enviarMensajeAspirante(msg) {
   await sockPubAspirante.send(['Respuesta', buf]);
 }
 
-function backUp() {
+async function backUp() {
+  await sockBackup.send('OK');
+  const [result] = await sockBackup.receive();
+  console.log(JSON.parse(result));
+
   if (false) {
     sockSubEmpleador.connect('tcp://127.0.0.1:8001');
     sockSubEmpleador.subscribe('Ofertas');
@@ -95,6 +101,9 @@ function backUp() {
   }
 }
 
-servidor.listen(3001, () => {
-  console.log('Servidor Filtro escuchando puerto 3001');
+servidor.listen(3005, () => {
+  console.log('Servidor Filtro escuchando puerto 3005');
+  sockBackup.connect('tcp://127.0.0.1:8006');
+  console.log('SeverDHT bound to port 8006');
+  backUp();
 });
