@@ -9,6 +9,7 @@ let ofertas = [];
 const sock = new zmq.Reply();
 let DHT1;
 let DHT2;
+let DHT3;
 
 const main = async () => {
   console.log('Servidor DHT escuchando puerto 8005');
@@ -73,9 +74,12 @@ function spawnNode(endpoint, seeds, cb) {
 
 function createSpawnNode() {
   spawnNode('localhost:9876', [], function (err, dht1) {
-    spawnNode('localhost:4321', [dht1.rpc.endpoint], function (err, dht2) {
       DHT1 = dht1;
+    spawnNode('localhost:4321', [dht1.rpc.endpoint], function (err, dht2) {
       DHT2 = dht2;
+    });
+    spawnNode('localhost:4322', [dht1.rpc.endpoint], function (err, dht3) {
+      DHT3 = dht3;
     });
   });
 }
