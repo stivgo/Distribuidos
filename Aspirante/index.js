@@ -36,7 +36,7 @@ servidor.post('/aspirante/sub', async (req, res, next) => {
     let buffer = Buffer.from(JSON.stringify(req.body));
     const sector = JSON.parse(buffer).sector;
     sectores.push(sector);
-    console.log("Estas suscrito a: " + sectores);
+    console.log('Estas suscrito a: ' + sectores);
     res.status(201).json({ data: 'Se suscribió a ese sector' });
   } catch (error) {
     console.log(error);
@@ -46,25 +46,25 @@ servidor.post('/aspirante/sub', async (req, res, next) => {
 
 async function sockSubFiltroOn() {
   for await (const [topic, msg] of sockSubFiltro) {
-    console.log('Topic: ',String(topic),'\n','Message: ',JSON.parse(msg));
+    console.log('Topic: ', String(topic), '\n', 'Message: ', JSON.parse(msg));
     let oferta = Oferta.fromJSON(msg);
     try {
-      console.log("Tiene una nueva oferta :\n"+oferta.toJSON());
+      console.log('Tiene una nueva oferta :\n' + oferta.toJSON());
     } catch (error) {
       console.log(error);
     }
-    console.log("termine")
+    console.log('termine');
   }
 }
 
 servidor.listen(3002, async () => {
   await sockPubFiltro.bind('tcp://127.0.0.1:8003');
   console.log('Publisher bound to sport 8003');
-  
+
   sockSubFiltro.connect('tcp://127.0.0.1:8004');
   sockSubFiltro.subscribe('Respuesta');
   console.log('Subscriber Empleador connected to port 8004');
   sockSubFiltroOn();
-  
+
   console.log('Servidor escuchando puerto 3002');
 });

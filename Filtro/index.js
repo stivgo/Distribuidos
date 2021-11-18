@@ -1,7 +1,7 @@
 const express = require('express');
 const Oferta = require('../Common/Oferta.js');
 
-let ofertas = []
+let ofertas = [];
 
 // Comunicación entre Empleador
 const zmq = require('zeromq');
@@ -11,8 +11,6 @@ const sockSubEmpleador = new zmq.Subscriber();
 //Comunnicación entre Aspirante
 const sockPubAspirante = new zmq.Publisher();
 const sockSubAspirante = new zmq.Subscriber();
-
-
 
 // Comunicación entre DHT
 const sockDHT = new zmq.Request();
@@ -31,45 +29,45 @@ servidor.use((err, req, res, next) => {
 
 async function sockSubEmpleadorOn() {
   for await (const [topic, msg] of sockSubEmpleador) {
-    console.log('Topic: ',String(topic),'\n','Message: ',JSON.parse(msg));
+    console.log('Topic: ', String(topic), '\n', 'Message: ', JSON.parse(msg));
     let oferta = Oferta.fromJSON(msg);
     ofertas.push(oferta);
     try {
-      console.log("Info a enviar:\n"+oferta.toJSON());
+      console.log('Info a enviar:\n' + oferta.toJSON());
       await sockDHT.send(oferta.toJSON());
       const [result] = await sockDHT.receive();
       const resultParse = JSON.parse(result.toString());
-      console.log(resultParse)
+      console.log(resultParse);
     } catch (error) {
       console.log(error);
     }
-    console.log("termine")
+    console.log('termine');
   }
 }
 
-async function enviarMensajeEmpleador(msg){
+async function enviarMensajeEmpleador(msg) {
   const buf = Buffer.from(JSON.stringify(msg));
   await sockPubEmpleador.send(['Respuesta', buf]);
 }
 
 async function sockSubAspiranteOn() {
   for await (const [topic, msg] of sockSubEmpleador) {
-    console.log('Topic: ',String(topic),'\n','Message: ',JSON.parse(msg));
+    console.log('Topic: ', String(topic), '\n', 'Message: ', JSON.parse(msg));
     let oferta = Oferta.fromJSON(msg);
     ofertas.push(oferta);
     try {
-      console.log("Info a enviar:\n"+oferta.toJSON());
+      console.log('Info a enviar:\n' + oferta.toJSON());
       await sockDHT.send(oferta.toJSON());
       const [result] = await sockDHT.receive();
       const resultParse = JSON.parse(result.toString());
-      console.log(resultParse)
+      console.log(resultParse);
     } catch (error) {
       console.log(error);
     }
   }
 }
 
-async function enviarMensajeAspirante(msg){
+async function enviarMensajeAspirante(msg) {
   const buf = Buffer.from(JSON.stringify(msg));
   await sockPubAspirante.send(['Respuesta', buf]);
 }
@@ -90,9 +88,9 @@ servidor.listen(3001, () => {
 
   await sockPubAspirante.bind('tcp://127.0.0.1:8004');
   console.log('Publisher Empleador to sport 8004');
-  
+
   sockDHT.connect('tcp://127.0.0.1:8005');
   console.log('SeverDHT bound to port 8005');
-  
+
   console.log('Servidor Filtro escuchando puerto 3001');
 });
