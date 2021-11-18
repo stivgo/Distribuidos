@@ -8,8 +8,8 @@ class Oferta{
     }
     toJSON(){
         return("{"+
-        "\"id\":\""+this.id + "\","+
-        "\"empleador\":\""+this.empleador + "\","+
+        "\"id\":"+this.id + ","+
+        "\"empleador\":"+this.empleador + ","+
         "\"nombre\":\""+this.nombre + "\","+
         "\"sector\":\""+this.sector + "\","+
         "\"habilidades\":"+JSON.stringify(this.habilidades)+

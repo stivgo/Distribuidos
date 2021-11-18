@@ -61,7 +61,6 @@ async function sockSubAspiranteOn() {
     } catch (error) {
       console.log(error);
     }
-    console.log("termine")
   }
 }
 

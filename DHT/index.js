@@ -1,7 +1,10 @@
 ('use strict');
 var kad = require('kademlia-dht');
 const zmq = require('zeromq');
+var fs = require('fs');
 const Oferta = require('../Common/Oferta');
+
+let ofertas =  [];
 
 const sock = new zmq.Reply();
 let DHT1;
@@ -15,8 +18,13 @@ const main = async () => {
     for await (const [msg] of sock) {
       let oferta = Oferta.fromJSON(msg);
       console.log(oferta);
+      ofertas.push(oferta.toJSON());
+      fs.writeFile("test.json",'['+ofertas.toString()+']', function(err){
+        if(err){
+          console.log(err);
+        }
+      });
       setInfo(oferta.id+" "+oferta.empleador,oferta);
-      getInfo('1 1')
       const sendInfo = Buffer.from(JSON.stringify('recepcion DHT'));
       await sock.send(sendInfo);
     }
