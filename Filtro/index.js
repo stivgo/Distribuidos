@@ -47,6 +47,11 @@ async function sockSubEmpleadorOn() {
   }
 }
 
+async function enviarMensajeEmpleador(msg){
+  const buf = Buffer.from(JSON.stringify(msg));
+  await sockPubEmpleador.send(['Respuesta', buf]);
+}
+
 async function sockSubAspiranteOn() {
   for await (const [topic, msg] of sockSubEmpleador) {
     console.log('Topic: ',String(topic),'\n','Message: ',JSON.parse(msg));
@@ -64,16 +69,30 @@ async function sockSubAspiranteOn() {
   }
 }
 
+async function enviarMensajeAspirante(msg){
+  const buf = Buffer.from(JSON.stringify(msg));
+  await sockPubAspirante.send(['Respuesta', buf]);
+}
+
 servidor.listen(3001, () => {
   sockSubEmpleador.connect('tcp://127.0.0.1:8001');
   sockSubEmpleador.subscribe('Ofertas');
+  sockSubEmpleadorOn();
   console.log('Subscriber Empleador connected to port 8001');
-  sockDHT.connect('tcp://127.0.0.1:8002');
-  console.log('SeverDHT bound to port 8002');
+
+  await sockPubEmpleador.bind('tcp://127.0.0.1:8002');
+  console.log('Publisher Empleador to sport 8002');
+
   sockSubAspirante.connect('tcp://127.0.0.1:8003');
   sockSubAspirante.subscribe('Ofertas');
-  console.log('Subscriber Aspirante connected to port 8003');
-  sockSubEmpleadorOn();
   sockSubAspiranteOn();
+  console.log('Subscriber Aspirante connected to port 8003');
+
+  await sockPubAspirante.bind('tcp://127.0.0.1:8004');
+  console.log('Publisher Empleador to sport 8004');
+  
+  sockDHT.connect('tcp://127.0.0.1:8005');
+  console.log('SeverDHT bound to port 8005');
+  
   console.log('Servidor Filtro escuchando puerto 3001');
 });
