@@ -1,7 +1,7 @@
 {
-  "name": "aspirante",
+  "name": "filtro",
   "version": "1.0.0",
-  "description": "proyecto distribuidos - seccion aspirante",
+  "description": "proyecto distribuidos - seccion filtro",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
